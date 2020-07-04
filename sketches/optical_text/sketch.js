@@ -36,7 +36,8 @@ function addText(material, scene) {
 
     var geometry2 = new THREE.TextGeometry( 'Swake', {
       font: font, 
-      size: 80,
+      size: 0.4,
+      height: 0.2,
       curveSegments: 12, 
       bevelEnabled: false, 
       bevelThickness: 10,
@@ -44,9 +45,11 @@ function addText(material, scene) {
       bevelOffset: 0, 
       bevelSegments: 5
     })
+    geometry2.translate(-1,0,-.2);
     let textMesh = new THREE.Mesh(geometry2, material);
+    textMesh.position.z = 0.5;
+    // textMesh.position.x = -1;
     scene.add(textMesh);
-
   });
 }
 
@@ -137,9 +140,9 @@ const sketch = ({ context }) => {
   scene.add(mesh);
 
 
-  const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1,1,1).translate(0,0,-0.5), material);
-  scene.add(box);
-  box.position.z = 1.2;
+  // const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1,1,1).translate(0,0,-0.5), material);
+  // scene.add(box);
+  // box.position.z = 1.2;
 
   addText(material, scene);
 
@@ -166,8 +169,8 @@ const sketch = ({ context }) => {
       controls.update();
       renderer.render(scene, camera);
 
-      box.rotation.x = mouseTarget.x;
-      box.rotation.y = mouseTarget.y;
+      // box.rotation.x = mouseTarget.x;
+      // box.rotation.y = mouseTarget.y;
 
     },
     // Dispose of events & renderer for cleaner hot-reloading
