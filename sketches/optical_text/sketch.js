@@ -27,12 +27,14 @@ const sketch = ({ context }) => {
   // WebGL background color
   renderer.setClearColor("#000", 1);
 
+  let time = 0;
+
   // Setup a camera
   // const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 100);
   const frustumSize = 4;
   const aspect = window.innerWidth / window.innerHeight;
   const camera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1000)
-  camera.position.set(0, 0, 0);
+  camera.position.set(0, 0, .1);
   camera.lookAt(new THREE.Vector3());
 
   // Setup camera controller
@@ -50,6 +52,18 @@ const sketch = ({ context }) => {
   //   wireframe: true
   // });
 
+  // GUI Settings
+
+    const guiSettings = {
+      time: 0,
+      rotation: 0,
+      lineWidth: 0
+    }
+  
+    const gui = new dat.GUI();
+    gui.add(guiSettings, "rotation", 0, 6, 0.01);
+    gui.add(guiSettings, "lineWidth", 0, 1, 0.01);
+
   const geometry = new THREE.PlaneGeometry(4*aspect - 0.2, 3.8, 1, 1);
 
   const material = new THREE.ShaderMaterial({
@@ -59,6 +73,8 @@ const sketch = ({ context }) => {
     side: THREE.DoubleSide,
     uniforms: {
       time: {type: "f", value: 0},
+      rotation: {type: "f", value: 0},
+      lineWidth: {type: "f", value: 0},
       resolution: { type: "v4", value: new THREE.Vector4()},
       uvRate1: {
         value: new THREE.Vector2(1, 1)
@@ -82,6 +98,7 @@ const sketch = ({ context }) => {
   const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1,1,1), material);
   scene.add(box);
 
+
   // draw each frame
   return {
     // Handle resize events here
@@ -92,9 +109,12 @@ const sketch = ({ context }) => {
       camera.updateProjectionMatrix();
     },
     // Update & render your scene here
-    render({ time }) {
+    render({ time, material }) {
       controls.update();
       renderer.render(scene, camera);
+      // time += 0.05;
+      // material.uniforms.time.value = time;
+      // material.uniforms.rotation.value = guiSettings.rotation
     },
     // Dispose of events & renderer for cleaner hot-reloading
     unload() {
