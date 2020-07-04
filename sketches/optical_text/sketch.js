@@ -109,12 +109,13 @@ const sketch = ({ context }) => {
       camera.updateProjectionMatrix();
     },
     // Update & render your scene here
-    render({ time, material }) {
+    render({ time }) {
+      time += 0.05;
+      material.uniforms.time.value = time;
+      material.uniforms.rotation.value = guiSettings.rotation;
       controls.update();
       renderer.render(scene, camera);
-      // time += 0.05;
-      // material.uniforms.time.value = time;
-      // material.uniforms.rotation.value = guiSettings.rotation
+
     },
     // Dispose of events & renderer for cleaner hot-reloading
     unload() {
