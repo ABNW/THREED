@@ -61,7 +61,7 @@ const sketch = ({ context }) => {
     }
   
     const gui = new dat.GUI();
-    gui.add(guiSettings, "rotation", 0, 6, 0.01);
+    gui.add(guiSettings, "rotation", 0, Math.PI, 0.01);
     gui.add(guiSettings, "lineWidth", 0, 1, 0.01);
 
   const geometry = new THREE.PlaneGeometry(4*aspect - 0.2, 3.8, 1, 1);
