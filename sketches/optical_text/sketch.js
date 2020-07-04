@@ -2,6 +2,7 @@ import { TimelineMax } from "gsap";
 import * as dat from "dat.gui";
 import fragment from './shaders/fragment.glsl';
 import vertex from './shaders/vertex.glsl';
+import ffont from './font.json';
 
 // Ensure ThreeJS is in global scope for the 'examples/'
 global.THREE = require("three");
@@ -18,11 +19,36 @@ const settings = {
   context: "webgl"
 };
 
-function mouseEvents(){
+const innerWidth = window.innerWidth;
+const innerHeight = window.innerHeight;
+
+function mouseEvents(mousePos){
   document.addEventListener('mousemove', (e)=>{
-    console.log(e);
+    mousePos.x = (e.clientY / innerWidth - 0.5) * -2;
+    mousePos.y = 2*(e.clientX / innerHeight - 0.5) * -2;
   });
 };
+
+function addText(material, scene) {
+  let loader = new THREE.FontLoader();
+
+  loader.load( 'https://threejs.org/examples/fonts/droid/droid_sans_bold.typeface.json', function(font) {
+
+    var geometry2 = new THREE.TextGeometry( 'Swake', {
+      font: font, 
+      size: 80,
+      curveSegments: 12, 
+      bevelEnabled: false, 
+      bevelThickness: 10,
+      bevelSize: 8, 
+      bevelOffset: 0, 
+      bevelSegments: 5
+    })
+    let textMesh = new THREE.Mesh(geometry2, material);
+    scene.add(textMesh);
+
+  });
+}
 
 const sketch = ({ context }) => {
   // Create a renderer
@@ -33,17 +59,22 @@ const sketch = ({ context }) => {
   // WebGL background color
   renderer.setClearColor("#000", 1);
 
+
   let time = 0;
 
   // Setup a camera
   // const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 100);
-  const frustumSize = 4;
+  const frustumSize = 5;
   const aspect = window.innerWidth / window.innerHeight;
   const camera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1000)
   camera.position.set(0, 0, .1);
   camera.lookAt(new THREE.Vector3());
 
-  const mouseInfo  = mouseEvents();
+
+  const mousePos  = new THREE.Vector2(0,0);
+  const mouseTarget = new THREE.Vector2(0,0);
+
+  mouseEvents(mousePos);
 
   // Setup camera controller
   const controls = new THREE.OrbitControls(camera, context.canvas);
@@ -110,6 +141,8 @@ const sketch = ({ context }) => {
   scene.add(box);
   box.position.z = 1.2;
 
+  addText(material, scene);
+
 
   // draw each frame
   return {
@@ -123,12 +156,18 @@ const sketch = ({ context }) => {
     // Update & render your scene here
     render({ time }) {
       time += 0.05;
+      mouseTarget.x -= 0.05 * (mouseTarget.x - mousePos.x);
+      mouseTarget.y -= 0.05 * (mouseTarget.y - mousePos.y);
+
       material.uniforms.time.value = time;
       material.uniforms.rotation.value = guiSettings.rotation;
       material.uniforms.lineWidth.value = guiSettings.lineWidth;
       material.uniforms.repeat.value = guiSettings.repeat;
       controls.update();
       renderer.render(scene, camera);
+
+      box.rotation.x = mouseTarget.x;
+      box.rotation.y = mouseTarget.y;
 
     },
     // Dispose of events & renderer for cleaner hot-reloading
