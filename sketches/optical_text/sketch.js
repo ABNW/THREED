@@ -78,6 +78,10 @@ const sketch = ({ context }) => {
   const mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
 
+
+  const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1,1,1), material);
+  scene.add(box);
+
   // draw each frame
   return {
     // Handle resize events here
