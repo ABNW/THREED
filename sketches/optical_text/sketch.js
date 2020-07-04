@@ -10,6 +10,7 @@ global.THREE = require("three");
 // Include any additional ThreeJS examples below
 require("three/examples/js/controls/OrbitControls");
 
+
 const canvasSketch = require("canvas-sketch");
 
 const settings = {
@@ -24,19 +25,21 @@ const innerHeight = window.innerHeight;
 
 function mouseEvents(mousePos){
   document.addEventListener('mousemove', (e)=>{
-    mousePos.x = (e.clientY / innerWidth - 0.5) * -2;
-    mousePos.y = 2*(e.clientX / innerHeight - 0.5) * -2;
+    mousePos.x = (e.pageY / innerWidth - 0.5) * -2;
+    mousePos.y = 2*(e.pageX / innerHeight - 0.5) * -2;
   });
 };
 
+var textGlobal;
+
 function addText(material, scene) {
   let loader = new THREE.FontLoader();
-
+  var textMesh;
   loader.load( 'https://threejs.org/examples/fonts/droid/droid_sans_bold.typeface.json', function(font) {
 
     var geometry2 = new THREE.TextGeometry( 'Swake', {
       font: font, 
-      size: 0.4,
+      size: 1,
       height: 0.2,
       curveSegments: 12, 
       bevelEnabled: false, 
@@ -45,11 +48,12 @@ function addText(material, scene) {
       bevelOffset: 0, 
       bevelSegments: 5
     })
-    geometry2.translate(-1,0,-.2);
-    let textMesh = new THREE.Mesh(geometry2, material);
-    textMesh.position.z = 0.5;
-    // textMesh.position.x = -1;
+    geometry2.translate(-3,-.5,-.2);
+    var textMesh = new THREE.Mesh(geometry2, material);
+    textMesh.position.z = 2;
     scene.add(textMesh);
+    textGlobal = textMesh;
+    console.log(myVar);
   });
 }
 
@@ -96,17 +100,17 @@ const sketch = ({ context }) => {
 
   // GUI Settings
 
-    const guiSettings = {
-      time: 0,
-      rotation: Math.PI / 2,
-      lineWidth: 0.2,
-      repeat: 8
-    }
-  
-    const gui = new dat.GUI();
-    gui.add(guiSettings, "rotation", 0, Math.PI, 0.01);
-    gui.add(guiSettings, "lineWidth", 0, .5, 0.01);
-    gui.add(guiSettings, "repeat", 0, 100, 1)
+  const guiSettings = {
+    time: 0,
+    rotation: Math.PI / 2,
+    lineWidth: 0.2,
+    repeat: 8
+  }
+
+  const gui = new dat.GUI();
+  gui.add(guiSettings, "rotation", 0, Math.PI, 0.01);
+  gui.add(guiSettings, "lineWidth", 0, .5, 0.01);
+  gui.add(guiSettings, "repeat", 0, 100, 1)
 
   const geometry = new THREE.PlaneGeometry(4*aspect - 0.2, 3.8, 1, 1);
 
@@ -169,8 +173,11 @@ const sketch = ({ context }) => {
       controls.update();
       renderer.render(scene, camera);
 
-      // box.rotation.x = mouseTarget.x;
-      // box.rotation.y = mouseTarget.y;
+      if(textGlobal) {
+      textGlobal.rotation.x = mouseTarget.x;
+      textGlobal.rotation.y = mouseTarget.y;
+      }
+
 
     },
     // Dispose of events & renderer for cleaner hot-reloading
