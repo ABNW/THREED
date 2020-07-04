@@ -2,11 +2,12 @@ uniform float time;
 uniform float progress;
 uniform float rotation;
 uniform float lineWidth;
+uniform float repeat;
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform vec4 resolution;
 varying vec2 vUv;
-varying vec4 vPosition;
+varying vec3 vPosition;
 
 float aastep(float threshold, float value) {
   #ifdef GL_OES_standard_derivatives
@@ -23,14 +24,6 @@ vec2 rotate(vec2 v, float a) {
 	float c = cos(a);
 	mat2 m = mat2(c, -s, s, c);
 	return m * v;
-}
-
-float line(vec2 uv){
-  float u = 0.;
-
-  u = aastep(0.1, uv.x);
-
-  return u;
 }
 
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
@@ -105,21 +98,35 @@ float cnoise(vec3 P){
   return 2.2 * n_xyz;
 }
 
+float line(vec2 uv, float width){
+  float u = 0.;
+  if(uv.x < 0.03) {
+    u = 0.;
+  } else if(uv.x > 1. - 0.03) {
+    u = 0.;
+  } else {
+    u = aastep(width, uv.x) - aastep(1. - width, uv.x);
+  }
+
+  return u;
+}
+
 
 void main() {
 
-  vec2 newUV = gl_FragCoord.xy/resolution.xy;
+//  vec2 newUV = gl_FragCoord.xy/resolution.xy;
+  vec2 newUV = vPosition.xy;
 
   newUV = rotate(newUV, rotation);
 
-  float noise = cnoise(vec3(newUV, 1.));
+  float noise = cnoise(vec3(newUV + time/16. + vPosition.z, 0.));
 
 
   //repeat
   newUV += vec2(noise);
-  newUV = vec2(fract( (newUV.x + newUV.y)*15.),newUV.y);
+  newUV = vec2(fract( (newUV.x + newUV.y)*repeat),newUV.y);
 
 
-  gl_FragColor = vec4(vec3(line(newUV)), 1.);
-  // gl_FragColor = vec4(newUV, 0., 1.);
+  gl_FragColor = vec4(vec3(line(newUV, lineWidth)), 1.);
+  // gl_FragColor = vec4(vPosition, 1.);
 }

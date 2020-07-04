@@ -18,6 +18,12 @@ const settings = {
   context: "webgl"
 };
 
+function mouseEvents(){
+  document.addEventListener('mousemove', (e)=>{
+    console.log(e);
+  });
+};
+
 const sketch = ({ context }) => {
   // Create a renderer
   const renderer = new THREE.WebGLRenderer({
@@ -36,6 +42,8 @@ const sketch = ({ context }) => {
   const camera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1000)
   camera.position.set(0, 0, .1);
   camera.lookAt(new THREE.Vector3());
+
+  const mouseInfo  = mouseEvents();
 
   // Setup camera controller
   const controls = new THREE.OrbitControls(camera, context.canvas);
@@ -56,13 +64,15 @@ const sketch = ({ context }) => {
 
     const guiSettings = {
       time: 0,
-      rotation: 0,
-      lineWidth: 0
+      rotation: Math.PI / 2,
+      lineWidth: 0.2,
+      repeat: 8
     }
   
     const gui = new dat.GUI();
     gui.add(guiSettings, "rotation", 0, Math.PI, 0.01);
-    gui.add(guiSettings, "lineWidth", 0, 1, 0.01);
+    gui.add(guiSettings, "lineWidth", 0, .5, 0.01);
+    gui.add(guiSettings, "repeat", 0, 100, 1)
 
   const geometry = new THREE.PlaneGeometry(4*aspect - 0.2, 3.8, 1, 1);
 
@@ -76,6 +86,7 @@ const sketch = ({ context }) => {
       rotation: {type: "f", value: 0},
       lineWidth: {type: "f", value: 0},
       resolution: { type: "v4", value: new THREE.Vector4()},
+      repeat: {type: "f", value: 0},
       uvRate1: {
         value: new THREE.Vector2(1, 1)
       }
@@ -95,8 +106,9 @@ const sketch = ({ context }) => {
   scene.add(mesh);
 
 
-  const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1,1,1), material);
+  const box = new THREE.Mesh(new THREE.BoxBufferGeometry(1,1,1).translate(0,0,-0.5), material);
   scene.add(box);
+  box.position.z = 1.2;
 
 
   // draw each frame
@@ -113,6 +125,8 @@ const sketch = ({ context }) => {
       time += 0.05;
       material.uniforms.time.value = time;
       material.uniforms.rotation.value = guiSettings.rotation;
+      material.uniforms.lineWidth.value = guiSettings.lineWidth;
+      material.uniforms.repeat.value = guiSettings.repeat;
       controls.update();
       renderer.render(scene, camera);
 
