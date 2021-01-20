@@ -12,7 +12,7 @@
   "dependencies": {
     "canvas-sketch": "^0.7.3",
     "dat.gui": "^0.7.7",
-    "gsap": "^3.3.4",
+    "gsap": "^3.6.0",
     "three": "^0.118.3"
   }
 }
